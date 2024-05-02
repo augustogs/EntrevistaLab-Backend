@@ -23,7 +23,7 @@ function processarTexto(texto) {
     const partes = texto.split(/(Pergunta|Resposta|Feedback da) [0-9]:/);
 
     let partesFiltradas = partes.filter(part => part.trim() !== '');
-    partesFiltradas = partesFiltradas.filter(part => part.length >= 30);
+    partesFiltradas = partesFiltradas.filter(part => part.length >= 40);
     partesFiltradas = partesFiltradas.map(part => part.replace("Feedback da", "").trim());
 
     return partesFiltradas;
