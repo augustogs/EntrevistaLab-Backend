@@ -4,15 +4,17 @@ import feedbackUtil from '../utils/feedbackUtil.js';
 
 import dotenv from 'dotenv';
 
+import db from '../../database.js';
+
 dotenv.config(); 
 
 const gerarFeedback = async (req, res) => {
-    const { perguntas, respostas } = req.body;
+    const { usuario, areaAtuacao, perguntas, respostas } = req.body;
     
     const texto = feedbackUtil.juntarPerguntasERespostas(perguntas, respostas);
 
     try {
-        const resposta = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.API_KEY}`, {
+        const resposta = await fetch(`${process.env.API_URL}${process.env.API_KEY}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -35,6 +37,19 @@ const gerarFeedback = async (req, res) => {
         
         const feedbacks = feedbackUtil.removeAsterisks(textoFeedbackGerado);
         const textoProcessado = feedbackUtil.processarTexto(feedbacks);
+
+        const dataEntrevista = new Date().toISOString();
+        const query = 'INSERT INTO entrevistas (usuario_id, area_atuacao, perguntas, respostas, texto_feedback, data_entrevista) VALUES (?, ?, ?, ?, ?, ?)';
+        const params = [usuario, JSON.stringify(areaAtuacao), JSON.stringify(perguntas), JSON.stringify(respostas), JSON.stringify(textoProcessado), dataEntrevista];
+        
+        console.log(areaAtuacao);
+        db.run(query, params, function(err) {
+            if (err) {
+                console.error('Erro ao inserir entrevista:', err.message);
+            } else {
+                console.log('Entrevista inserida com sucesso.');
+            }
+        });
         
         res.json({ textoFeedback: textoProcessado });
 

@@ -8,7 +8,7 @@ const gerarPerguntas = async (req, res) => {
     const { areaAtuacao } = req.body;
 
     try {
-        const resposta = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.API_KEY}`, {
+        const resposta = await fetch(`${process.env.API_URL}${process.env.API_KEY}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
